@@ -1,9 +1,9 @@
 # TODO: This is just a prototyping template code. Remove it.
-from nena_component_tools.internal.task_iterator import get_task_iterator
+from nena_component_tools.internal.task_iterator import create_task_iterator
 
 
 def main():
-    task_iterator = get_task_iterator()
+    task_iterator = create_task_iterator()
     for task in task_iterator:
         was_successful, output_dictionary = call_sub_pipeline(task.input_dictionary)
         if was_successful:

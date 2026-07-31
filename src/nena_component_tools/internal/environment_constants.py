@@ -5,7 +5,6 @@ from enum import StrEnum
 INPUT_BUCKETS = os.environ['INPUT_BUCKETS']
 OUTPUT_BUCKETS = os.environ['OUTPUT_BUCKETS']
 QUEUE_URL = os.environ['QUEUE_URL']
-OUTPUT_EVENT_SOURCE = os.environ.get('OUTPUT_EVENT_SOURCE', 'nena.container')
 
 
 class DeploymentType(StrEnum):

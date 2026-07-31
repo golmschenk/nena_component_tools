@@ -1,5 +1,6 @@
-# TODO: Currently this is prototyping code. Finalize it.
 import json
+import logging
+import math
 from typing import Iterator
 
 import boto3
@@ -7,29 +8,39 @@ import boto3
 from nena_component_tools.internal.environment_constants import QUEUE_URL
 from nena_component_tools.internal.task import Task
 
-sqs = boto3.client('sqs')
-events = boto3.client('events')
+logger = logging.getLogger()
 
 
-def get_task_iterator() -> Iterator:
+def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+    """
+    Creates a task iterator.
+
+    :param upper_bound_run_time__seconds: The upper bound of runtime of the possible tasks. Will be used to delay a
+        message before showing it again to another task worker.
+    :return: An infinite iterator over the available tasks in the queue.
+    """
+    sqs = boto3.client('sqs')
+    wait_time__seconds = 60
+    message_getting_cost_offset__seconds = 60
+    upper_bound_run_time_scale_factor = 2
+    if upper_bound_run_time__seconds < message_getting_cost_offset__seconds:
+        number_of_messages_to_get = math.ceil(message_getting_cost_offset__seconds / upper_bound_run_time__seconds)
+    else:
+        number_of_messages_to_get = 1
+
     while True:
-        resp = sqs.receive_message(
+        response = sqs.receive_message(
             QueueUrl=QUEUE_URL,
-            MaxNumberOfMessages=1,
-            WaitTimeSeconds=20,
-            VisibilityTimeout=300,
+            MaxNumberOfMessages=number_of_messages_to_get,
+            WaitTimeSeconds=wait_time__seconds,
+            VisibilityTimeout=upper_bound_run_time__seconds * upper_bound_run_time_scale_factor,
         )
 
-        messages = resp.get('Messages', [])
-        if not messages:
-            continue
-
-        msg = messages[0]
-        input_message_receipt_handle = msg['ReceiptHandle']
-        input_message_id = msg['MessageId']
-
-        try:
-            detail = json.loads(msg['Body'])
+        messages = response.get('Messages', [])
+        for message in messages:
+            input_message_receipt_handle = message['ReceiptHandle']
+            input_message_id = message['MessageId']
+            detail = json.loads(message['Body'])
             message_content = detail.get('content', detail)
             task = Task(
                 message_content,
@@ -38,5 +49,3 @@ def get_task_iterator() -> Iterator:
                 _input_message_receipt_handle=input_message_receipt_handle,
             )
             yield task
-        except Exception:
-            pass  # TODO: Log exception.
