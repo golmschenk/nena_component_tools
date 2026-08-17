@@ -13,7 +13,9 @@ keywords = []
 authors = [
   { name = "golmschenk", email = "greg@olmschenk.com" },
 ]
-dependencies = []
+dependencies = [
+  'boto3',
+]
 
 [project.urls]
 Documentation = "https://github.com/golmschenk/nena-component-tools#readme"

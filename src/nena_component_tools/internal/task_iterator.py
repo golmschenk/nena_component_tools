@@ -47,5 +47,7 @@ def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
                 _input_message_id=input_message_id,
                 _input_message_queue_url=QUEUE_URL,
                 _input_message_receipt_handle=input_message_receipt_handle,
+                _event_correlation_id=detail.get('event_correlation_id'),
+                _event_causation_id=detail.get('event_id'),
             )
             yield task

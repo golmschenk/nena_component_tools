@@ -1,6 +1,7 @@
 # TODO: Currently this is prototyping code. Finalize it.
 import json
 import logging
+import uuid
 from dataclasses import dataclass
 
 import boto3
@@ -20,6 +21,8 @@ class Task:
     _input_message_queue_url: str
     _input_message_receipt_handle: str
     _input_message_id: str
+    _event_correlation_id: str
+    _event_causation_id: str
 
     def emit_completion_event(self, event_source: str, output_dictionary: JsonDictionary) -> None:
         events.put_events(
@@ -29,11 +32,9 @@ class Task:
                     'DetailType': 'task.completed',
                     'Detail': json.dumps(
                         {
-                            'triggering_message': {
-                                'queue': self._input_message_queue_url,
-                                'id': self._input_message_id,
-                                # TODO: I think the message might disappear after it's read. Consider storing it somewhere somehow.
-                            },
+                            'event_correlation_id': self._event_correlation_id,
+                            'event_causation_id': self._event_causation_id,
+                            'event_id': uuid.uuid4(),
                             'content': output_dictionary,
                         }
                     ),
