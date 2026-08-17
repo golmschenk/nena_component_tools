@@ -24,7 +24,7 @@ class Task:
     _event_correlation_id: str
     _event_causation_id: str
 
-    def emit_completion_event(self, event_source: str, output_dictionary: JsonDictionary) -> None:
+    def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
         events.put_events(
             Entries=[
                 {
@@ -41,7 +41,8 @@ class Task:
                 }
             ]
         )
-        sqs.delete_message(QueueUrl=self._input_message_queue_url, ReceiptHandle=self._input_message_receipt_handle)
+        if mark_task_complete:
+            sqs.delete_message(QueueUrl=self._input_message_queue_url, ReceiptHandle=self._input_message_receipt_handle)
 
     def log_failure(self, dictionary: JsonDictionary) -> None:
         failure_json_string = json.dumps({
