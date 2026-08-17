@@ -1,4 +1,3 @@
-# TODO: Currently this is prototyping code. Finalize it.
 import json
 import logging
 import uuid
@@ -47,11 +46,11 @@ class Task:
     def log_failure(self, dictionary: JsonDictionary) -> None:
         failure_json_string = json.dumps({
             'input_dictionary': self.input_dictionary,
-            'input_message': {
-                'queue': self._input_message_queue_url,
-                'id': self._input_message_id,
-                'receipt_handle': self._input_message_receipt_handle,
-            },
+            'input_message_queue': self._input_message_queue_url,
+            'input_message_id': self._input_message_id,
+            'input_message_receipt_handle': self._input_message_receipt_handle,
+            'event_correlation_id': self._event_correlation_id,
+            'event_causation_id': self._event_causation_id,
             'component_report_dictionary': dictionary,
         })
         logger.error(failure_json_string)
