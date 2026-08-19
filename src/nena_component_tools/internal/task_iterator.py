@@ -1,17 +1,27 @@
 import json
 import logging
 import math
+import os
+from pathlib import Path
 from typing import Iterator
 
 import boto3
 
 from nena_component_tools.internal.environment_constants import QUEUE_URL
-from nena_component_tools.internal.task import Task
+from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata, EventPipelineTask, LocalTask, \
+    LocalTaskMetadata
 
 logger = logging.getLogger()
 
 
 def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+    if os.environ.get('NENA_IN_EVENT_PIPELINE', 'false').lower() == 'true':
+        yield from create_sqs_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
+    else:
+        yield from create_local_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
+
+
+def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
     """
     Creates a task iterator.
 
@@ -42,12 +52,27 @@ def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
             input_message_id = message['MessageId']
             detail = json.loads(message['Body'])
             message_content = detail.get('content', detail)
-            task = Task(
+            task = EventPipelineTask(
                 message_content,
-                _input_message_id=input_message_id,
-                _input_message_queue_url=QUEUE_URL,
-                _input_message_receipt_handle=input_message_receipt_handle,
-                _event_correlation_id=detail.get('event_correlation_id'),
-                _event_causation_id=detail.get('event_id'),
+                EventPipelineTaskMetadata(
+                    input_message_id=input_message_id,
+                    input_message_queue_url=QUEUE_URL,
+                    input_message_receipt_handle=input_message_receipt_handle,
+                    output_event_correlation_id=detail.get('event_correlation_id'),
+                    output_event_causation_id=detail.get('event_id'),
+                ),
+            )
+            yield task
+
+
+def create_local_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+    for input_event_index, input_event_json_path in enumerate(Path('input_events').glob('*.json')):
+        with input_event_json_path.open() as input_message_json_file_handle:
+            input_dictionary = json.load(input_message_json_file_handle)
+            task = LocalTask(
+                input_dictionary,
+                LocalTaskMetadata(
+                    input_event_path=input_event_json_path
+                ),
             )
             yield task
