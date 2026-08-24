@@ -93,7 +93,7 @@ class LocalTask(Task):
     _metadata: LocalTaskMetadata
 
     def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
-        output_file_stem = f'{datetime.datetime.now():%Y_%m_%d_%H_%M_%S}_from_{self._metadata.input_event_path.stem}.json'
+        output_file_stem = f'{datetime.datetime.now():%Y_%m_%d_%H_%M_%S}_from_{self._metadata.input_event_path.stem}'
         for index in itertools.count():
             index_suffix = '' if index == 0 else f'_{index}'
             output_path = Path('output_events').joinpath(f'{output_file_stem}{index_suffix}.json')
