@@ -15,7 +15,7 @@ if DEPLOYMENT_TYPE != DeploymentType.LOCAL:
     sqs = boto3.client('sqs')
     events = boto3.client('events')
 else:
-    sqs = None
+    sqs = None  # TODO: This shouldn't just be `None` in this case, as it breaks typehinting.
     events = None
 
 type JsonType = dict[str, 'JsonType'] | list['JsonType'] | str | int | float | bool | None
@@ -93,10 +93,12 @@ class LocalTask(Task):
     _metadata: LocalTaskMetadata
 
     def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+        output_events_directory = Path('output_events')
+        output_events_directory.mkdir(exist_ok=True, parents=True)
         output_file_stem = f'{datetime.datetime.now():%Y_%m_%d_%H_%M_%S}_from_{self._metadata.input_event_path.stem}'
         for index in itertools.count():
             index_suffix = '' if index == 0 else f'_{index}'
-            output_path = Path('output_events').joinpath(f'{output_file_stem}{index_suffix}.json')
+            output_path = output_events_directory.joinpath(f'{output_file_stem}{index_suffix}.json')
             if not output_path.exists():
                 break
         # Using `noinspection` below, as the above `count` means `output_path` will always be set.
