@@ -2,11 +2,7 @@
 import os
 from enum import StrEnum
 
-INPUT_BUCKETS = os.environ['INPUT_BUCKETS']
-OUTPUT_BUCKETS = os.environ['OUTPUT_BUCKETS']
-QUEUE_URL = os.environ['QUEUE_URL']
-
-
+# TODO: This is duplicating the pipeline variable. But this way is probably better.
 class DeploymentType(StrEnum):
     PRODUCTION = 'production'
     DEVELOPMENT = 'development'

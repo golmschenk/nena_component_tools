@@ -9,8 +9,14 @@ from pathlib import Path
 
 import boto3
 
-sqs = boto3.client('sqs')
-events = boto3.client('events')
+from nena_component_tools.internal.environment_constants import DeploymentType, DEPLOYMENT_TYPE
+
+if DEPLOYMENT_TYPE != DeploymentType.LOCAL:
+    sqs = boto3.client('sqs')
+    events = boto3.client('events')
+else:
+    sqs = None
+    events = None
 
 type JsonType = dict[str, 'JsonType'] | list['JsonType'] | str | int | float | bool | None
 type JsonDictionary = dict[str, JsonType]

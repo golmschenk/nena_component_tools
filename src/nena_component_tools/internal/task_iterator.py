@@ -7,7 +7,6 @@ from typing import Iterator
 
 import boto3
 
-from nena_component_tools.internal.environment_constants import QUEUE_URL
 from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata, EventPipelineTask, LocalTask, \
     LocalTaskMetadata
 
@@ -30,6 +29,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
     :return: An infinite iterator over the available tasks in the queue.
     """
     sqs = boto3.client('sqs')
+    queue_url = os.environ['QUEUE_URL']  # TODO: This should probably be read differently.
     wait_time__seconds = 60
     message_getting_cost_offset__seconds = 60
     upper_bound_run_time_scale_factor = 2
@@ -40,7 +40,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
 
     while True:
         response = sqs.receive_message(
-            QueueUrl=QUEUE_URL,
+            QueueUrl=queue_url,
             MaxNumberOfMessages=number_of_messages_to_get,
             WaitTimeSeconds=wait_time__seconds,
             VisibilityTimeout=upper_bound_run_time__seconds * upper_bound_run_time_scale_factor,
@@ -56,7 +56,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
                 message_content,
                 EventPipelineTaskMetadata(
                     input_message_id=input_message_id,
-                    input_message_queue_url=QUEUE_URL,
+                    input_message_queue_url=queue_url,
                     input_message_receipt_handle=input_message_receipt_handle,
                     output_event_correlation_id=detail.get('event_correlation_id'),
                     output_event_causation_id=detail.get('event_id'),
@@ -65,6 +65,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
             yield task
 
 
+# noinspection unused-parameter
 def create_local_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
     for input_event_index, input_event_json_path in enumerate(Path('input_events').glob('*.json')):
         with input_event_json_path.open() as input_message_json_file_handle:
