@@ -14,14 +14,14 @@ from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata, 
 logger = logging.getLogger()
 
 
-def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+def create_task_iterator() -> Iterator[Task]:
     if DEPLOYMENT_TYPE == DeploymentType.LOCAL:
-        yield from create_local_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
+        yield from create_local_task_iterator()
     else:
-        yield from create_sqs_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
+        yield from create_sqs_task_iterator()
 
 
-def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+def create_sqs_task_iterator() -> Iterator[Task]:
     """
     Creates a task iterator.
 
@@ -31,6 +31,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
     """
     sqs = boto3.client('sqs')
     queue_url = os.environ['NENA_SQS_QUEUE_URL']  # TODO: This should probably be read differently.
+    upper_bound_run_time__seconds = int(os.environ['NENA_UPPER_BOUND_RUN_TIME__SECONDS'])
     wait_time__seconds = 60
     message_getting_cost_offset__seconds = 60
     upper_bound_run_time_scale_factor = 2
@@ -66,8 +67,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
             yield task
 
 
-# noinspection unused-parameter
-def create_local_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
+def create_local_task_iterator() -> Iterator[Task]:
     for input_event_index, input_event_json_path in enumerate(Path('input_events').glob('*.json')):
         with input_event_json_path.open() as input_message_json_file_handle:
             input_dictionary = json.load(input_message_json_file_handle)
