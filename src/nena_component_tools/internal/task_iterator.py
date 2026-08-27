@@ -7,6 +7,7 @@ from typing import Iterator
 
 import boto3
 
+from nena_component_tools.internal.environment_constants import DEPLOYMENT_TYPE, DeploymentType
 from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata, EventPipelineTask, LocalTask, \
     LocalTaskMetadata
 
@@ -14,10 +15,10 @@ logger = logging.getLogger()
 
 
 def create_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
-    if os.environ.get('NENA_IN_EVENT_PIPELINE', 'false').lower() == 'true':
-        yield from create_sqs_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
-    else:
+    if DEPLOYMENT_TYPE == DeploymentType.LOCAL:
         yield from create_local_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
+    else:
+        yield from create_sqs_task_iterator(upper_bound_run_time__seconds=upper_bound_run_time__seconds)
 
 
 def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Task]:
@@ -29,7 +30,7 @@ def create_sqs_task_iterator(upper_bound_run_time__seconds: int) -> Iterator[Tas
     :return: An infinite iterator over the available tasks in the queue.
     """
     sqs = boto3.client('sqs')
-    queue_url = os.environ['QUEUE_URL']  # TODO: This should probably be read differently.
+    queue_url = os.environ['NENA_SQS_QUEUE_URL']  # TODO: This should probably be read differently.
     wait_time__seconds = 60
     message_getting_cost_offset__seconds = 60
     upper_bound_run_time_scale_factor = 2

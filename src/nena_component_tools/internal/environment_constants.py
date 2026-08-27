@@ -10,10 +10,10 @@ class DeploymentType(StrEnum):
 
 
 def get_deployment_type() -> DeploymentType:
-    deployment_type = os.environ.get('DEPLOYMENT_TYPE', 'local')
+    deployment_type = os.environ.get('NENA_DEPLOYMENT_TYPE', 'local')
     if deployment_type not in DeploymentType:
         raise ValueError(f'Invalid deployment type `{deployment_type}` found in environment variable '
-                         f'`DEPLOYMENT_TYPE`.')
+                         f'`NENA_DEPLOYMENT_TYPE`.')
     return DeploymentType(deployment_type)
 
 
