@@ -1,5 +1,7 @@
 import abc
 import datetime
+import os
+
 import itertools
 import json
 import logging
@@ -42,7 +44,7 @@ class Task(abc.ABC):
     _metadata: EventPipelineTaskMetadata | LocalTaskMetadata
 
     @abc.abstractmethod
-    def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+    def emit_event(self, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
         pass
 
     @abc.abstractmethod
@@ -54,9 +56,9 @@ class EventPipelineTask(Task):
     input_dictionary: JsonDictionary
     _metadata: EventPipelineTaskMetadata
 
-    def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+    def emit_event(self, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
         event_dictionary = {
-            'Source': event_source,
+            'Source': os.environ['NENA_COMPONENT_PIPELINE_NAME'],
             'DetailType': 'task.completed',
             'Detail': json.dumps(
                 {
@@ -92,7 +94,7 @@ class LocalTask(Task):
     input_dictionary: JsonDictionary
     _metadata: LocalTaskMetadata
 
-    def emit_event(self, event_source: str, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+    def emit_event(self, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
         output_events_directory = Path('output_events')
         output_events_directory.mkdir(exist_ok=True, parents=True)
         output_file_stem = f'{datetime.datetime.now():%Y_%m_%d_%H_%M_%S}_from_{self._metadata.input_event_path.stem}'
