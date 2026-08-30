@@ -15,6 +15,12 @@ logger = logging.getLogger()
 
 
 def create_task_iterator() -> Iterator[Task]:
+    """
+    Creates a task iterator. When run on a local machine, the iterator iterates over tasks defined by JSON event files
+    in a local directory. When run in production, the tasks are defined by polled SQS messages and loops infinitely.
+
+    :return: The task iterator.
+    """
     if DEPLOYMENT_TYPE == DeploymentType.LOCAL:
         yield from create_local_task_iterator()
     else:
@@ -25,8 +31,6 @@ def create_sqs_task_iterator() -> Iterator[Task]:
     """
     Creates a task iterator.
 
-    :param upper_bound_run_time__seconds: The upper bound of runtime of the possible tasks. Will be used to delay a
-        message before showing it again to another task worker.
     :return: An infinite iterator over the available tasks in the queue.
     """
     sqs = boto3.client('sqs')

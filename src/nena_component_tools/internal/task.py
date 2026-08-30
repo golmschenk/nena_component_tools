@@ -40,6 +40,9 @@ class LocalTaskMetadata:
 
 @dataclass
 class Task(abc.ABC):
+    """
+    A class representing a pipeline task.
+    """
     input_dictionary: JsonDictionary
     _metadata: EventPipelineTaskMetadata | LocalTaskMetadata
 
