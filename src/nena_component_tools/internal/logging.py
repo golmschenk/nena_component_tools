@@ -7,15 +7,26 @@ logger_initialized = False
 
 
 def create_default_formatter() -> logging.Formatter:
+    """
+    Creates the default log formatter.
+
+    :return: The formatter.
+    """
     formatter = logging.Formatter('nena_component_tools [{asctime} {levelname} {name}] {message}', style='{')
     return formatter
 
 
-def enable_logger():
+def enable_logger() -> None:
+    """
+    Enables the logger.
+    """
     set_up_default_logger()
 
 
-def set_up_default_logger():
+def set_up_default_logger() -> None:
+    """
+    Sets up the default logger.
+    """
     global logger_initialized
     if not logger_initialized:
         formatter = create_default_formatter()

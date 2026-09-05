@@ -21,6 +21,9 @@ else:
 
 @dataclass
 class EventPipelineTaskMetadata:
+    """
+    Metadata for a task in the event-driven pipeline.
+    """
     input_message_queue_url: str
     input_message_receipt_handle: str
     input_message_id: str
@@ -30,10 +33,19 @@ class EventPipelineTaskMetadata:
 
 @dataclass
 class EventPipelineTask(Task):
+    """
+    A class to represent a task in the event driven pipeline.
+    """
     input_dictionary: JsonDictionary
     _metadata: EventPipelineTaskMetadata
 
     def emit_event(self, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+        """
+        Emits an event in the event-driven pipeline.
+
+        :param output_dictionary: The dictionary to include as the content of the event.
+        :param mark_task_complete: Whether to mark the task as completed.
+        """
         event_dictionary = {
             'Source': os.environ['NENA_COMPONENT_PIPELINE_NAME'],
             'DetailType': 'task.completed',
@@ -56,6 +68,11 @@ class EventPipelineTask(Task):
                                ReceiptHandle=self._metadata.input_message_receipt_handle)
 
     def log_failure(self, dictionary: JsonDictionary) -> None:
+        """
+        Log a failure along w with the task metadata.
+
+        :param dictionary: The component provided dictionary to include in the log.
+        """
         failure_json_string = json.dumps({
             'input_dictionary': self.input_dictionary,
             'input_message_queue': self._metadata.input_message_queue_url,

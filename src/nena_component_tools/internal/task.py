@@ -21,9 +21,20 @@ class Task(abc.ABC):
 
     @abc.abstractmethod
     def emit_event(self, output_dictionary: JsonDictionary, mark_task_complete: bool = True) -> None:
+        """
+        Emits an event from the task.
+
+        :param output_dictionary: The content to include in the event.
+        :param mark_task_complete: Whether to mark the event as complete.
+        """
         pass
 
     @abc.abstractmethod
     def log_failure(self, dictionary: JsonDictionary) -> None:
+        """
+        Logs a failure on the task.
+
+        :param dictionary: A dictionary to include in the failure log.
+        """
         pass
 

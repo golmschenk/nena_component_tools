@@ -72,6 +72,11 @@ def create_sqs_task_iterator() -> Iterator[Task]:
 
 
 def create_local_task_iterator() -> Iterator[Task]:
+    """
+    Creates a task iterator designed for local component development.
+
+    :return: The task iterator.
+    """
     for input_event_index, input_event_json_path in enumerate(Path('input_events').glob('*.json')):
         with input_event_json_path.open() as input_message_json_file_handle:
             input_dictionary = json.load(input_message_json_file_handle)
