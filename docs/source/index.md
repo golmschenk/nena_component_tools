@@ -4,6 +4,11 @@
 ```{toctree}
 :maxdepth: 2
 
+:maxdepth: 2
+:titlesonly:
+
+smce/index
+aws_pipeline/index
 reference_index
 ```
 
