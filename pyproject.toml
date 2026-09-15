@@ -31,6 +31,7 @@ path = "src/nena_component_tools/__about__.py"
 extra-dependencies = [
   "mypy>=1.0.0",
 ]
+
 [tool.hatch.envs.types.scripts]
 test = "pytest {args:tests}"
 check = "mypy --install-types --non-interactive {args:src/nena_component_tools tests}"

@@ -8,7 +8,8 @@ from typing import Iterator
 import boto3
 
 from nena_component_tools.internal.environment_constants import DEPLOYMENT_TYPE, DeploymentType
-from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata, EventPipelineTask
+from nena_component_tools.internal.event_pipeline_task import EventPipelineTask
+from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata
 from nena_component_tools.internal.local_task import LocalTaskMetadata, LocalTask
 
 logger = logging.getLogger()
