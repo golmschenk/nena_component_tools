@@ -7,6 +7,7 @@
 :maxdepth: 2
 :titlesonly:
 
+containerization_guide/index
 smce/index
 aws_pipeline/index
 reference_index
