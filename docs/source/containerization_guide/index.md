@@ -14,6 +14,10 @@ Within the global pipeline, your component pipeline will be triggered by events.
 
 The framework allows you to easily mock this event system. When you run your code locally, the framework will read events from a set of JSON files in a local directory, as though these were incoming events. It also gives you a command to send off events, which will be put into JSON files in another directory. When it gets moved to cloud infrastructure, the framework will automatically read from and write to real live event streams instead. This is designed to make it easy for you to test things locally while having it ready for cloud use.
 
+```{image} event_local_vs_cloud_conceptual_overview.png
+:width: 800px
+```
+
 ## Basic usage
 
 We'll go into more detail soon, but the basic use case is relatively simple. In this basic example we assume your component pipeline consists of a Python function. Don't worry, we handle other cases elsewhere, but this makes for a very simple example. First, we import your component pipeline function and a function from the framework that gives us events.
