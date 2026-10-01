@@ -43,10 +43,5 @@ CMD ["python", "./container_loop.py"]
 ```
 This runs the main program loop. The `container_loop.py` file uses the containerization framework in a loop. Locally, this will process the events in `input_events`. On the cloud, this will run indefinitely waiting for new events to arrive.
 
-## Running the container locally
-
-To run this container on your local machine, first be certain your container platform is running (e.g., Docker Desktop). Then, from the root directory of the project, run
-```shell
-docker compose up --build --force-recreate
+```{include} ./running_the_container_subsection.md
 ```
-This will run through the mock JSON events in `input_events` and output JSON files to the `output_events` directory.
