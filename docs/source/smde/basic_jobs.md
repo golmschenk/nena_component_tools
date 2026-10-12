@@ -19,7 +19,7 @@ The remainder of the script runs mostly as normal. Save the following script as 
 #!/bin/bash
 
 #SBATCH --job-name=minimal_job
-#SBATCH --partition=roman-c5n18xlarge-od
+#SBATCH --partition=mem-sm
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=5G
@@ -64,7 +64,7 @@ Depending on your specific purpose, one of these options might be better than th
 ```bash
 #!/bin/bash
 
-#SBATCH --partition=roman-c5n18xlarge-od
+#SBATCH --partition=mem-sm
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem-per-cpu=5G
