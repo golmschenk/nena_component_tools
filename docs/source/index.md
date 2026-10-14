@@ -8,7 +8,7 @@
 :titlesonly:
 
 containerization_guide/index
-smce/index
+smdc/index
 aws_pipeline/index
 reference_index
 ```
