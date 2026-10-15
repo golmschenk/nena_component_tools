@@ -24,7 +24,7 @@ The first line, `FROM python:3.14-slim` specifies the base container environment
 
 The next line `WORKDIR /workspace` creates a directory for your code to work in. Again, unless you have a good reason to change it, this should stay as is.
 
-Next we have
+Next, we have
 ```dockerfile
 COPY pyproject.toml .
 COPY *.py .
