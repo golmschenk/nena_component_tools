@@ -11,7 +11,7 @@ author = "Greg Olmschenk"
 extensions = [
     "myst_parser",
     "sphinx.ext.autodoc",
-    "sphinx_image_inverter"
+    # "sphinx_image_inverter"
 ]
 
 templates_path = ["_templates"]
@@ -25,4 +25,4 @@ autodoc_default_options = {
 html_theme = "furo"
 html_static_path = ["_static"]
 
-inverter_all = False
+# inverter_all = False
