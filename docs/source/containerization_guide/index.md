@@ -5,5 +5,6 @@
 :caption: Table of contents
 
 containerization_framework_overview
-python_containerization_step
+containerization_step_with_a_python_component_pipeline
+containerization_step_with_a_fortran_component_pipeline
 ```
