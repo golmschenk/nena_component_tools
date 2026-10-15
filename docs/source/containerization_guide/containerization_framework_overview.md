@@ -5,6 +5,7 @@ You have a component pipeline that's going to run as part of the global fully au
 ## The bit of the cloud infrastructure you should know
 
 ```{image} event_conceptual_overview.png
+:class: dark-light
 :width: 800px
 ```
 
