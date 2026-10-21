@@ -10,5 +10,6 @@ in:
       - ./output_events:/workspace/output_events
 ```
 
-For running your code locally, make input and output data directories available in a similar way. Later, we'll see how
-to map an S3 bucket to a local directory as well.
+For running your code locally, make input and output data directories available in a similar way. By default, the
+containerized code will run within the container's `/workspace/` path, so directories within that can be relatively
+accessed with just the directory name. Later, we'll see how to map an S3 bucket to a local directory as well.
