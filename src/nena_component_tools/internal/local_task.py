@@ -6,7 +6,8 @@ import itertools
 from dataclasses import dataclass
 from pathlib import Path
 
-from nena_component_tools.internal.task import Task, JsonDictionary
+from nena_component_tools.internal.json_types import JsonDictionary
+from nena_component_tools.internal.task import Task
 
 logger = logging.getLogger(__name__)
 

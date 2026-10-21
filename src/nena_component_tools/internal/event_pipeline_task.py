@@ -7,7 +7,8 @@ from dataclasses import dataclass
 import boto3
 
 from nena_component_tools.internal.environment_constants import DeploymentType, DEPLOYMENT_TYPE
-from nena_component_tools.internal.task import JsonDictionary, Task
+from nena_component_tools.internal.json_types import JsonDictionary
+from nena_component_tools.internal.task import Task
 
 logger = logging.getLogger(__name__)
 

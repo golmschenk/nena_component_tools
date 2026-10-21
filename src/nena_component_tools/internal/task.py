@@ -3,10 +3,8 @@ import logging
 from dataclasses import dataclass
 
 from nena_component_tools.internal.event_pipeline_task import EventPipelineTaskMetadata
+from nena_component_tools.internal.json_types import JsonDictionary
 from nena_component_tools.internal.local_task import LocalTaskMetadata
-
-type JsonType = dict[str, 'JsonType'] | list['JsonType'] | str | int | float | bool | None
-type JsonDictionary = dict[str, JsonType]
 
 logger = logging.getLogger(__name__)
 

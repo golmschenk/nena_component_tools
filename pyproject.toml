@@ -18,7 +18,6 @@ dependencies = [
   "myst-parser",
   "furo>=2023.9.10",
   "astropy",
-  "sphinx-image-inverter"
 ]
 
 [project.urls]
