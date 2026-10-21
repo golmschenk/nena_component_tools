@@ -24,3 +24,4 @@ autodoc_default_options = {
 html_theme = 'furo'
 html_static_path = ['_static']
 html_css_files = ['dark_invert.css']
+html_title = 'nena component tools'
