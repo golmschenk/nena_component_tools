@@ -9,8 +9,10 @@ import boto3
 
 from nena_component_tools.internal.environment_constants import DEPLOYMENT_TYPE, DeploymentType
 from nena_component_tools.internal.event_pipeline_task import EventPipelineTask
-from nena_component_tools.internal.task import Task, EventPipelineTaskMetadata
-from nena_component_tools.internal.local_task import LocalTaskMetadata, LocalTask
+from nena_component_tools.internal.task import Task
+from nena_component_tools.internal.event_pipeline_task_metadata import EventPipelineTaskMetadata
+from nena_component_tools.internal.local_task import LocalTask
+from nena_component_tools.internal.local_task_metadata import LocalTaskMetadata
 
 logger = logging.getLogger()
 

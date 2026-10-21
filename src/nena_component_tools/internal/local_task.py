@@ -7,17 +7,10 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from nena_component_tools.internal.json_types import JsonDictionary
+from nena_component_tools.internal.local_task_metadata import LocalTaskMetadata
 from nena_component_tools.internal.task import Task
 
 logger = logging.getLogger(__name__)
-
-
-@dataclass
-class LocalTaskMetadata:
-    """
-    Metadata in a local task.
-    """
-    input_event_path: Path
 
 
 @dataclass

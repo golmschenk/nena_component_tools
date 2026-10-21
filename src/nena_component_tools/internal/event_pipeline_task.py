@@ -7,6 +7,7 @@ from dataclasses import dataclass
 import boto3
 
 from nena_component_tools.internal.environment_constants import DeploymentType, DEPLOYMENT_TYPE
+from nena_component_tools.internal.event_pipeline_task_metadata import EventPipelineTaskMetadata
 from nena_component_tools.internal.json_types import JsonDictionary
 from nena_component_tools.internal.task import Task
 
@@ -21,21 +22,9 @@ else:
 
 
 @dataclass
-class EventPipelineTaskMetadata:
-    """
-    Metadata for a task in the event-driven pipeline.
-    """
-    input_message_queue_url: str
-    input_message_receipt_handle: str
-    input_message_id: str
-    output_event_correlation_id: str
-    output_event_causation_id: str
-
-
-@dataclass
 class EventPipelineTask(Task):
     """
-    A class to represent a task in the event driven pipeline.
+    A class to represent a task in the event-driven pipeline.
     """
     input_dictionary: JsonDictionary
     _metadata: EventPipelineTaskMetadata

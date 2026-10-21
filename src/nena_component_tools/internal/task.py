@@ -2,9 +2,9 @@ import abc
 import logging
 from dataclasses import dataclass
 
-from nena_component_tools.internal.event_pipeline_task import EventPipelineTaskMetadata
+from nena_component_tools.internal.event_pipeline_task_metadata import EventPipelineTaskMetadata
 from nena_component_tools.internal.json_types import JsonDictionary
-from nena_component_tools.internal.local_task import LocalTaskMetadata
+from nena_component_tools.internal.local_task_metadata import LocalTaskMetadata
 
 logger = logging.getLogger(__name__)
 
