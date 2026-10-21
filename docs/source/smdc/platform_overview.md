@@ -6,6 +6,7 @@ The SMCE is hosted on [Amazon Web Services (AWS)](https://aws.amazon.com), the l
 
 ```{image} smdc_connection_overview.png
 :width: 800px
+:class: dark-light
 ```
 
 The SMCE is connected to, but distinct from, the Roman Research Nexus (Nexus). The Nexus is also hosted on AWS. However, the Nexus is a publicly available platform with (in many ways) more limited capabilities. The Nexus should be seen as the public platform for access to Roman and PIT data and quick data analysis capabilities. The SMCE is for large-scale internal processing. Storage is available that is shared between the SMCE and the Nexus, so it's possible for the SMCE to make data available to Nexus users.

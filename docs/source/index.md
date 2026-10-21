@@ -3,8 +3,6 @@
 ## Table of contents
 ```{toctree}
 :maxdepth: 2
-
-:maxdepth: 2
 :titlesonly:
 
 containerization_guide/index

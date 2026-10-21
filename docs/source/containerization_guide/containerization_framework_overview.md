@@ -5,8 +5,8 @@ You have a component pipeline that's going to run as part of the global fully au
 ## The bit of the cloud infrastructure you should know
 
 ```{image} event_conceptual_overview.png
-:class: dark-light
 :width: 800px
+:class: dark-light
 ```
 
 Within the global pipeline, your component pipeline will be triggered by events. You get to pick which event streams you're subscribed to. For example, the microlensing modeling group will subscribe to new light curve events. That is, each time an upstream component pipeline produces a new light curve, it will emit a new event saying "Hey! There's a new light curve. You can find it here.", and the modeling group's pipeline will trigger based on these new events coming in. Events are passed around in a JSON format. The event content will also usually point to some form of storage (e.g., where the light curve was saved to). Once an event like this pops up, a box will automatically start running your component pipeline. Your component pipeline will get this JSON message, and your code will do whatever it needs to do (e.g., run modeling on the light curve). Then, your pipeline can also save results to storage and emit its own events.
@@ -17,6 +17,7 @@ The framework allows you to easily mock this event system. When you run your cod
 
 ```{image} event_local_vs_cloud_conceptual_overview.png
 :width: 800px
+:class: dark-light
 ```
 
 ## Basic usage

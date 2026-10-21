@@ -1,3 +1,15 @@
-html[data-theme='dark'] img.dark-light {
-    filter: invert(1) hue-rotate(180deg) saturate(1.5);
+@media not print {
+    img.dark-light {
+        filter: invert(1) hue-rotate(180deg) saturate(1.2) brightness(1.8);
+    }
+
+    body[data-theme='light'] img.dark-light {
+        filter: none;
+    }
+
+    @media (prefers-color-scheme: light) {
+        body:not([data-theme='dark']) img.dark-light {
+            filter: none;
+        }
+    }
 }
