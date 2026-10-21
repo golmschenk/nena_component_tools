@@ -6,6 +6,9 @@ have already read the [containerization framework overview guide](./index.md). T
 ```{include} ./container_platform_subsection.md
 ```
 
+```{include} ./installing_nena_component_tools_subsection.md
+```
+
 ## Container environment
 
 The container environment is defined in the `Containerfile` file. Here we see
