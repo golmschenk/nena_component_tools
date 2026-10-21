@@ -64,5 +64,8 @@ CMD ["python", "./container_loop.py"]
 ```
 This runs the Python loop that passes the task information to Fortran. The `container_loop.py` file uses the containerization framework in a loop. Locally, this will process the events in `input_events`. On the cloud, this will run indefinitely waiting for new events to arrive. In this loop, we are just having Python directly call the Fortran executable from the command line. In many cases, using an programmatic interface (e.g., C-style foreign function interfaces) will provide many benefits (e.g., for debugging). But this excluded from this tutorial to keep the code minimal.
 
+```{include} ./accessing_data_directories_subsection.md
+```
+
 ```{include} ./running_the_container_subsection.md
 ```

@@ -40,6 +40,9 @@ RUN pip install --no-cache-dir .
 ```
 we are installing our package along with its dependencies. While I would recommend setting up your Python code as an installable package, this is not required. You can instead run the `pip install` for your dependencies and move over the source files to be called directly.
 
+```{include} ./accessing_data_directories_subsection.md
+```
+
 Finally, we run
 ```dockerfile
 CMD ["python", "./container_loop.py"]
