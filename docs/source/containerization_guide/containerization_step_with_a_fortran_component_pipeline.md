@@ -10,7 +10,7 @@ have already read the [containerization framework overview guide](./index.md). T
 
 The container environment is defined in the `Containerfile` file. Here we see
 ```dockerfile
-FROM python:3.14-slim
+FROM python:3.15-slim
 
 WORKDIR /workspace
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -27,7 +27,7 @@ RUN cmake --build build --config RelWithDebInfo
 CMD ["python", "./container_loop.py"]
 ```
 
-The first line, `FROM python:3.14-slim` specifies the base container environment you'll be using. I recommend this base container for all uses unless you have a good reason to choose another container.
+The first line, `FROM python:3.15-slim` specifies the base container environment you'll be using. I recommend this base container for all uses unless you have a good reason to choose another container.
 
 The next line `WORKDIR /workspace` creates a directory for your code to work in. Again, unless you have a good reason to change it, this should stay as is.
 

@@ -1,0 +1,3 @@
+html[data-theme='dark'] img.dark-light {
+    filter: invert(1) hue-rotate(180deg) saturate(1.5);
+}
