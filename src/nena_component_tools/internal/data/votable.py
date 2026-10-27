@@ -1,0 +1,2 @@
+class VOTable:
+    pass
