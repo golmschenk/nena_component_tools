@@ -7,13 +7,16 @@ class InvalidUcdException(Exception):
     pass
 
 class VOTableColumn:
-    def __init__(self):
-        pass
+    def __init__(self, name: str, ucd: str, unit: Unit, array: npt.NDArray):
+        self.name: str = name
+        self.ucd: str = ucd
+        self.unit: Unit = unit
+        self.array: npt.NDArray = array
 
     @classmethod
     def new(cls, name: str, ucd: str, unit: Unit, array: npt.NDArray):
-
-        return cls()
+        cls.verify_ucd(ucd)
+        return cls(name=name, ucd=ucd, unit=unit, array=array)
 
     @staticmethod
     def verify_ucd(ucd_string: str):
