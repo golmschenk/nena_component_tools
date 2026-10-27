@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 from astropy.units import Unit
 import numpy.typing as npt
 
@@ -15,8 +16,8 @@ class VOTableMetadataField:
         self.dtype: npt.DTypeLike = dtype
 
     @classmethod
-    def new(cls, name: str, ucd: str, unit: Unit, array: npt.NDArray, dtype: npt.DTypeLike | None = None):
+    def new(cls, name: str, ucd: str, unit: Unit, value: npt.NDArray, dtype: npt.DTypeLike | None = None):
         verify_ucd(ucd)
         if dtype is None:
-            dtype = array.dtype
+            dtype = np.result_type(value)
         return cls(name=name, ucd=ucd, unit=unit, value=value, dtype=dtype)
