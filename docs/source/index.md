@@ -8,6 +8,8 @@
 containerization_guide/index
 smdc/index
 aws_pipeline/index
+aws_pipeline/index
+global_pipeline/index
 reference_index
 ```
 
