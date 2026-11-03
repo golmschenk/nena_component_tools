@@ -1,5 +1,7 @@
 # Component pipeline input and output specifications
 
+_If you have any questions, others probably do as well. Ask working group 14 to clarify with additional documentation._
+
 ## Summary
 
 If you are creating a component pipeline that will run in the global pipeline, this document explains how you should 
