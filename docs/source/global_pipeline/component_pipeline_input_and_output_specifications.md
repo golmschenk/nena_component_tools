@@ -19,7 +19,7 @@ what you are expecting.
 
 ## Creating a component pipeline entry
 
-Go to the component pipeline input/output confluence page and copy either the "blank" example or the 
+Go to [the component pipeline input/output confluence page](https://rgespit.atlassian.net/wiki/x/A4DYT) and copy either the "blank" example or the 
 "example_pipeline_name" example. And fill in the entries for your own component pipeline. The remainder of document 
 hopes to clarify questions regarding this.
 
