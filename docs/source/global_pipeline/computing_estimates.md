@@ -14,5 +14,6 @@ total storage space you expect to use. However, this should be provided with not
 calculations, along with a brief description of when you will be using these resources (e.g., spead out through each 
 season, only after each season, etc.).
 
-The previous round of estimates is recorded [here](https://rgespit.atlassian.net/wiki/x/AYAeCg), which you may want
-to use as your basis for your updated estimates.
+Computing estimates will be provided on [this Confluence page](https://rgespit.atlassian.net/wiki/x/AQBwTQ). 
+The previous round of estimates is recorded [here](https://rgespit.atlassian.net/wiki/x/AYAeCg), 
+which you may want to use as your basis for your updated estimates.
