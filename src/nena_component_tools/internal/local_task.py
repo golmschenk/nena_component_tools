@@ -48,7 +48,7 @@ class LocalTask(Task):
         :param dictionary: The component provided dictionary to include in the log.
         """
         failure_json_string = json.dumps({
-            'input_event_path': self._metadata.input_event_path,
+            'input_event_path': str(self._metadata.input_event_path),
             'input_dictionary': self.input_dictionary,
             'component_report_dictionary': dictionary,
         })
