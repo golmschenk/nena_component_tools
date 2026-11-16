@@ -2,18 +2,20 @@ import numpy as np
 from astropy import units as u
 
 from nena_component_tools.internal.data.votable.column import VOTableColumn
-from nena_component_tools.internal.data.votable.metadata_field import VOTableMetadataField
+from nena_component_tools.internal.data.votable.metadata_info import VOTableMetadataInfo
+from nena_component_tools.internal.data.votable.metadata_param import VOTableMetadataParam
 from nena_component_tools.internal.data.votable.table import VOTable
 
 
 def test_create_votable():
     flux = np.array([1.25, 2.5, 3.75], dtype=np.float64)
     column = VOTableColumn.new(name='flux', ucd='phot.flux', unit=u.Jy, array=flux)
-    metadata = VOTableMetadataField.new(
+    metadata = VOTableMetadataParam.new(
         name='exposure', ucd='time.duration', unit=u.s, value=30.0,
     )
 
-    votable = VOTable.new(metadata_fields=[metadata], columns=[column])
+    info = VOTableMetadataInfo.new(name='telescope', value='ROMAN')
+    votable = VOTable.new(metadata_fields=[metadata, info], columns=[column])
 
     assert isinstance(votable, VOTable)
     assert len(votable.resources) == 1
@@ -32,6 +34,9 @@ def test_create_votable():
     assert param.value == 30.0
     assert param.ucd == 'time.duration'
     assert param.unit == u.s
+    assert len(table.infos) == 1
+    assert table.infos[0].name == 'telescope'
+    assert table.infos[0].value == 'ROMAN'
 
     astropy_table = table.to_table()
     assert astropy_table.colnames == ['flux']

@@ -9,8 +9,8 @@ class InvalidColumnTypeException(Exception):
     pass
 
 
-def verify_ucd(ucd_string: str) -> None:
-    is_valid = check_ucd(ucd_string, check_controlled_vocabulary=True)
+def verify_ucd(ucd_string: str, controlled_vocabulary=True) -> None:
+    is_valid = check_ucd(ucd_string, check_controlled_vocabulary=controlled_vocabulary)
     if not is_valid:
         raise InvalidUcdException(f'`{ucd_string}` is not a valid controlled vocabulary UCD. '
                                   f'See `https://ivoa.net/documents/UCD1+/20241218/EN-UCDlist-1.6-20241218.html'

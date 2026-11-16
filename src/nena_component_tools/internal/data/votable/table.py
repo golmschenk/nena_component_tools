@@ -2,10 +2,12 @@ from collections.abc import Iterable
 
 import numpy as np
 from astropy.io.votable.converters import numpy_to_votable_dtype
-from astropy.io.votable.tree import VOTableFile, Resource, TableElement, Field, Param
+from astropy.io.votable.tree import VOTableFile, Resource, TableElement, Field, Info, Param
 
 from nena_component_tools.internal.data.votable.column import VOTableColumnBase
 from nena_component_tools.internal.data.votable.metadata_field import VOTableMetadataField
+from nena_component_tools.internal.data.votable.metadata_info import VOTableMetadataInfo
+from nena_component_tools.internal.data.votable.metadata_param import VOTableMetadataParam
 from nena_component_tools.internal.data.votable.time_column import VOTableTimeColumn
 
 
@@ -38,11 +40,16 @@ class VOTable(VOTableFile):
             ))
 
         for metadata_field in metadata_fields:
-            table.params.append(Param(
-                votable, name=metadata_field.name, ucd=metadata_field.ucd,
-                unit=metadata_field.unit, value=metadata_field.value,
-                **numpy_to_votable_dtype(np.result_type(metadata_field.dtype), np.shape(metadata_field.value)[::-1]),
-            ))
+            if isinstance(metadata_field, VOTableMetadataInfo):
+                table.infos.append(Info(name=metadata_field.name, value=metadata_field.value))
+            elif isinstance(metadata_field, VOTableMetadataParam):
+                table.params.append(Param(
+                    votable, name=metadata_field.name, ucd=metadata_field.ucd,
+                    unit=metadata_field.unit, value=metadata_field.value,
+                    **numpy_to_votable_dtype(np.result_type(metadata_field.dtype), np.shape(metadata_field.value)[::-1]),
+                ))
+            else:
+                raise TypeError(f'Unsupported metadata field type: {type(metadata_field).__name__}')
 
         table.create_arrays(column_length)
         for column_index, column in enumerate(columns):
