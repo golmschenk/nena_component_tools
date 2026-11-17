@@ -3,6 +3,7 @@ from collections.abc import Iterable
 import numpy as np
 from astropy.io.votable.converters import numpy_to_votable_dtype
 from astropy.io.votable.tree import VOTableFile, Resource, TableElement, Field, Info, Param
+from astropy.time import Time
 
 from nena_component_tools.internal.data.votable.column import VOTableColumnBase
 from nena_component_tools.internal.data.votable.metadata_field import VOTableMetadataField
@@ -14,6 +15,12 @@ from nena_component_tools.internal.data.votable.time_column import VOTableTimeCo
 class VOTable(VOTableFile):
     @classmethod
     def new(cls, metadata_fields: list[VOTableMetadataField], columns: list[VOTableColumnBase]):
+        field_names = set()
+        for field in [*metadata_fields, *columns]:
+            if field.name in field_names:
+                raise ValueError(f'Duplicate field name: `{field.name}`.')
+            field_names.add(field.name)
+
         votable = cls()
         resource = Resource()
         votable.resources.append(resource)
@@ -56,6 +63,49 @@ class VOTable(VOTableFile):
             table.array[table.fields[column_index].ID] = column.array
 
         return votable
+
+
+    @classmethod
+    def for_rges_data_release(cls, metadata_fields: list[VOTableMetadataField], columns: list[VOTableColumnBase]):
+        constant_metadata_fields = [
+            VOTableMetadataInfo.new(name='ccsp.name', value='RGES'),
+            VOTableMetadataInfo.new(name='ccsp.archive_lead', value='Greg Olmschenk'),
+            VOTableMetadataInfo.new(name='ccsp.investigator', value='Scott Gaudi'),
+            VOTableMetadataInfo.new(name='ccsp.doi', value='11.11111/xxxx-xxxx'),  # TODO: Requires real value.
+            VOTableMetadataInfo.new(name='license', value='CC BY 4.0'),
+            VOTableMetadataInfo.new(name='license_url', value='https://creativecommons.org/licenses/by/4.0/'),
+            VOTableMetadataInfo.new(name='telescope', value='ROMAN'),
+            VOTableMetadataInfo.new(name='instrument.name', value='WFI'),
+            VOTableMetadataInfo.new(name='instrument.optical_element', value='F146,F087,F213'),
+            VOTableMetadataInfo.new(name='wavelength.band', value='OPTICAL'),
+            VOTableMetadataInfo.new(name='ccsp.intent', value='SCIENCE'),
+            VOTableMetadataInfo.new(name='wavelength.minimum', value='869'),
+            VOTableMetadataInfo.new(name='wavelength.maximum', value='2125'),
+            VOTableMetadataInfo.new(name='file_date', value=str(Time(Time.now(), format='isot').value))
+        ]
+        constant_names = {field.name for field in constant_metadata_fields}
+        for field in [*metadata_fields, *columns]:
+            if field.name in constant_names:
+                raise ValueError(f'Field name `{field.name}` is reserved for RGES constant metadata.')
+
+        required_metadata_field_names = [
+            'ccsp.data_release_id',
+            'file_version',
+            'target_name',  # TODO: It this always appropriate?
+            'target_keywords',
+            'simulated_flag',
+            'source_observations_id',
+
+        ]
+        provided_metadata_names = {
+            field.name for field in metadata_fields if isinstance(field, VOTableMetadataField)
+        }
+        missing_names = [name for name in required_metadata_field_names if name not in provided_metadata_names]
+        if missing_names:
+            names = ', '.join(f'`{name}`' for name in missing_names)
+            raise ValueError(f'Missing required RGES metadata fields: {names}.')
+
+        return cls.new(metadata_fields=[*constant_metadata_fields, *metadata_fields], columns=columns)
 
 
     @staticmethod
