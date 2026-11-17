@@ -10,9 +10,7 @@ from nena_component_tools.internal.data.votable.table import VOTable
 def test_create_votable():
     flux = np.array([1.25, 2.5, 3.75], dtype=np.float64)
     column = VOTableColumn.new(name='flux', ucd='phot.flux', unit=u.Jy, array=flux)
-    metadata = VOTableMetadataParam.new(
-        name='exposure', ucd='time.duration', unit=u.s, value=30.0,
-    )
+    metadata = VOTableMetadataParam.new(name='exposure', value=30.0, ucd='time.duration', unit=u.s)
 
     info = VOTableMetadataInfo.new(name='telescope', value='ROMAN')
     votable = VOTable.new(metadata_fields=[metadata, info], columns=[column])

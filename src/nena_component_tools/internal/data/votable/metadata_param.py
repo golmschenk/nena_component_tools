@@ -16,7 +16,7 @@ class VOTableMetadataParam(VOTableMetadataField):
         self.dtype: npt.DTypeLike = dtype
 
     @classmethod
-    def new(cls, name: str, ucd: str, unit: UnitBase, value: Any, dtype: npt.DTypeLike | None = None):
+    def new(cls, name: str, value: Any, ucd: str, unit: UnitBase, dtype: npt.DTypeLike | None = None):
         verify_ucd(ucd, controlled_vocabulary=False)
         if dtype is None:
             dtype = np.result_type(value)

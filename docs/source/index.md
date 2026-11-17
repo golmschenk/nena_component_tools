@@ -9,6 +9,7 @@ containerization_guide/index
 smdc/index
 aws_pipeline/index
 global_pipeline/index
+data_release/index
 reference_index
 ```
 

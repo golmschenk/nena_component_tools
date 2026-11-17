@@ -15,6 +15,16 @@ from nena_component_tools.internal.data.votable.table import VOTable
 from nena_component_tools.internal.data.votable.time_column import VOTableTimeColumn
 
 
+RGES_REQUIRED_METADATA = {
+    'ccsp.data_release_id': 'DR0',
+    'file_version': 'v0.1',
+    'target_name': 'alpha',
+    'target_keywords': 'Stars',
+    'simulated_flag': 'TRUE',
+    'source_observations_id': '123456789',
+}
+
+
 def round_trip(votable):
     output = BytesIO()
     votable.to_xml(output)
@@ -30,10 +40,10 @@ def test_columns_and_metadata_survive_xml_round_trip():
     ]
     metadata: list[VOTableMetadataField] = [
         VOTableMetadataInfo.new('telescope', 'ROMAN'),
-        VOTableMetadataParam.new('exposure', 'time.duration', u.s, 30.0, dtype=np.float32),
+        VOTableMetadataParam.new('exposure', 30.0, 'time.duration', u.s, dtype=np.float32),
         VOTableMetadataInfo.new('target_name', 'α Centauri'),
-        VOTableMetadataParam.new('ids', 'meta.id', u.dimensionless_unscaled, np.array([12, 34], dtype=np.int32)),
-        VOTableMetadataParam.new('label', 'meta.id', u.dimensionless_unscaled, np.str_('observation')),
+        VOTableMetadataParam.new('ids', np.array([12, 34], dtype=np.int32), 'meta.id', u.dimensionless_unscaled),
+        VOTableMetadataParam.new('label', np.str_('observation'), 'meta.id', u.dimensionless_unscaled),
     ]
 
     votable = VOTable.new(metadata, columns)
@@ -99,7 +109,7 @@ def test_array_cells_preserve_shape_and_row_count():
         VOTableColumn.new('flux', 'phot.flux', u.Jy, values),
         VOTableColumn.new('id', 'meta.id', u.dimensionless_unscaled, np.array([1, 2])),
     ]
-    metadata = [VOTableMetadataParam.new('offsets', 'phot.flux', u.Jy, values[0])]
+    metadata = [VOTableMetadataParam.new('offsets', values[0], 'phot.flux', u.Jy)]
 
     table = round_trip(VOTable.new(metadata, columns))
 
@@ -135,7 +145,7 @@ def test_duplicate_field_names_are_rejected(first_kind, second_kind):
         if kind == 'info':
             return VOTableMetadataInfo.new('shared_name', 'value')
         if kind == 'param':
-            return VOTableMetadataParam.new('shared_name', 'phot.flux', u.Jy, 1.0)
+            return VOTableMetadataParam.new('shared_name', 1.0, 'phot.flux', u.Jy)
         return VOTableColumn.new('shared_name', 'phot.flux', u.Jy, np.array([1.0]))
 
     fields = [make_field(first_kind), make_field(second_kind)]
@@ -148,8 +158,8 @@ def test_duplicate_field_names_are_rejected(first_kind, second_kind):
 
 def test_for_rges_adds_constant_metadata():
     metadata = [
-        VOTableMetadataInfo.new('target_name', 'alpha'),
-        VOTableMetadataParam.new('exposure', 'time.duration', u.s, 30.0),
+        *[VOTableMetadataInfo.new(name, value) for name, value in RGES_REQUIRED_METADATA.items()],
+        VOTableMetadataParam.new('exposure', 30.0, 'time.duration', u.s),
     ]
     columns = [VOTableColumn.new('flux', 'phot.flux', u.Jy, np.array([1.0, 2.0]))]
 
@@ -164,11 +174,20 @@ def test_for_rges_adds_constant_metadata():
         'ccsp.archive_lead': 'Greg Olmschenk',
         'ccsp.investigator': 'Scott Gaudi',
         'ccsp.doi': '11.11111/xxxx-xxxx',
-        'target_name': 'alpha',
+        'license': 'CC BY 4.0',
+        'license_url': 'https://creativecommons.org/licenses/by/4.0/',
+        'telescope': 'ROMAN',
+        'instrument.name': 'WFI',
+        'instrument.optical_element': 'F146,F087,F213',
+        'wavelength.band': 'OPTICAL',
+        'ccsp.intent': 'SCIENCE',
+        'wavelength.minimum': '869',
+        'wavelength.maximum': '2125',
+        **RGES_REQUIRED_METADATA,
     }
     assert [(param.name, param.value) for param in table.params] == [('exposure', 30.0)]
     np.testing.assert_array_equal(table.array['flux'], columns[0].array)
-    assert [field.name for field in metadata] == ['target_name', 'exposure']
+    assert [field.name for field in metadata] == [*RGES_REQUIRED_METADATA, 'exposure']
 
 
 @pytest.mark.parametrize('name', ['ccsp.name', 'ccsp.archive_lead', 'ccsp.investigator', 'ccsp.doi', 'file_date'])
@@ -179,7 +198,7 @@ def test_for_rges_rejects_constant_name_collisions(name, kind):
     if kind == 'info':
         metadata.append(VOTableMetadataInfo.new(name, 'custom'))
     elif kind == 'param':
-        metadata.append(VOTableMetadataParam.new(name, 'phot.flux', u.Jy, 1.0))
+        metadata.append(VOTableMetadataParam.new(name, 1.0, 'phot.flux', u.Jy))
     else:
         columns.append(VOTableColumn.new(name, 'phot.flux', u.Jy, np.array([1.0])))
 
@@ -190,7 +209,7 @@ def test_for_rges_rejects_constant_name_collisions(name, kind):
 @pytest.mark.parametrize('provided_names', [[], ['target_name'], ['exposure']])
 def test_for_rges_reports_missing_required_metadata(provided_names):
     metadata = [VOTableMetadataInfo.new(name, 'value') for name in provided_names]
-    missing_names = [name for name in ['target_name', 'exposure'] if name not in provided_names]
+    missing_names = [name for name in RGES_REQUIRED_METADATA if name not in provided_names]
 
     with pytest.raises(ValueError) as exc_info:
         VOTable.for_rges_data_release(metadata, [])
@@ -200,11 +219,11 @@ def test_for_rges_reports_missing_required_metadata(provided_names):
     )
 
 
-@pytest.mark.parametrize('name', ['target_name', 'exposure'])
+@pytest.mark.parametrize('name', RGES_REQUIRED_METADATA)
 def test_for_rges_columns_do_not_satisfy_required_metadata(name):
     metadata = [
         VOTableMetadataInfo.new(other_name, 'value')
-        for other_name in ['target_name', 'exposure'] if other_name != name
+        for other_name in RGES_REQUIRED_METADATA if other_name != name
     ]
     column = VOTableColumn.new(name, 'phot.flux', u.Jy, np.array([1.0]))
 
@@ -214,12 +233,9 @@ def test_for_rges_columns_do_not_satisfy_required_metadata(name):
 
 def test_for_rges_required_metadata_accepts_info_fields():
     metadata = [
-        VOTableMetadataInfo.new('target_name', 'alpha'),
-        VOTableMetadataInfo.new('exposure', '30 seconds'),
+        VOTableMetadataInfo.new(name, value) for name, value in RGES_REQUIRED_METADATA.items()
     ]
 
     table = VOTable.for_rges_data_release(metadata, []).get_first_table()
 
-    assert [(info.name, info.value) for info in table.infos[-2:]] == [
-        ('target_name', 'alpha'), ('exposure', '30 seconds'),
-    ]
+    assert [(info.name, info.value) for info in table.infos[-len(metadata):]] == list(RGES_REQUIRED_METADATA.items())
