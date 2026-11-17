@@ -1,4 +1,4 @@
-# Global pipeline documentation
+# Data release
 
 ```{toctree}
 :maxdepth: 2

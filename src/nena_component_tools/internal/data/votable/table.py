@@ -7,7 +7,7 @@ import numpy as np
 import pyarrow as pa
 import pyarrow.parquet as pq
 from astropy.io.votable.converters import numpy_to_votable_dtype
-from astropy.io.votable.tree import VOTableFile, Resource, TableElement, Field, Info, Param
+from astropy.io.votable.tree import VOTableFile, Resource, TableElement, Field, Info, Param, CooSys
 from astropy.table import Table, MaskedColumn
 from astropy.table.meta import get_yaml_from_table
 from astropy.time import Time
@@ -17,6 +17,7 @@ from nena_component_tools.internal.data.votable.metadata_field import VOTableMet
 from nena_component_tools.internal.data.votable.metadata_info import VOTableMetadataInfo
 from nena_component_tools.internal.data.votable.metadata_param import VOTableMetadataParam
 from nena_component_tools.internal.data.votable.time_column import VOTableTimeColumn
+from nena_component_tools.internal.data.votable.ucd import check_if_ucd_composed_word_includes_coordinate_system_ucd_word
 
 
 class VOTable(VOTableFile):
@@ -65,6 +66,16 @@ class VOTable(VOTableFile):
             else:
                 raise TypeError(f'Unsupported metadata field type: {type(metadata_field).__name__}')
 
+        coordinate_fields = [
+            field for field in [*table.fields, *table.params]
+            if check_if_ucd_composed_word_includes_coordinate_system_ucd_word(field.ucd)
+        ]
+        if coordinate_fields:
+            coordinate_system = CooSys(ID='ref.votable.coosys', system='ICRS', epoch=None, equinox=None)
+            resource.coordinate_systems.append(coordinate_system)
+            for field in coordinate_fields:
+                field.ref = coordinate_system.ID
+
         table.create_arrays(column_length)
         for column_index, column in enumerate(columns):
             table.array[table.fields[column_index].ID] = column.array
@@ -92,6 +103,8 @@ class VOTable(VOTableFile):
         ]
         constant_names = {field.name for field in constant_metadata_fields}
         for field in [*metadata_fields, *columns]:
+            if field.name == 'table_meta_yaml':
+                raise ValueError('Field name `table_meta_yaml` is reserved for Parquet metadata.')
             if field.name in constant_names:
                 raise ValueError(f'Field name `{field.name}` is reserved for RGES constant metadata.')
 
@@ -148,18 +161,14 @@ class VOTable(VOTableFile):
 
 
     def to_parquet(self, output: Path) -> None:
-        """Write Parquet with the MAST footer, replacing any existing file.
-
-        Includes table_meta_yaml, data-free VOTable XML, VOParquet version 1.0,
-        and INFO/PARAM values as top-level strings. Masked values become nulls.
-        """
-        table = self.get_first_table()
         footer = {
             field.name: self.convert_metadata_value_to_parquet_string(field.value)
             for field in self.get_metadata_fields()
         }
 
-        metadata_only = deepcopy(self, {id(table.array): table.array[:0].copy()})
+        metadata_only = deepcopy(self, {
+            id(table.array): table.array[:0].copy() for table in self.iter_tables()
+        })
         xml = BytesIO()
         metadata_only.to_xml(xml)
         footer['IVOA.VOTable-Parquet.content'] = xml.getvalue().decode('utf-8')
@@ -203,3 +212,23 @@ class VOTable(VOTableFile):
         for index, time_system in enumerate(unique_time_systems.values()):
             suffix = str(index) if len(unique_time_systems) > 1 else ''
             time_system.ID = f'ref.votable.timesys{suffix}'
+
+def show_mast_parquet_file_metadata(path):
+    footer = pq.read_metadata(path).metadata
+    if not isinstance(footer, dict):
+        raise TypeError(f'Expected footer metadata to be a dictionary, got {type(footer).__name__}.')
+    if not all(isinstance(key, bytes) and isinstance(value, bytes) for key, value in footer.items()):
+        raise TypeError('Expected footer metadata to have bytes keys and values.')
+    print('File-level metadata:')
+
+    for key, value in sorted(footer.items()):
+        if key not in {b'ARROW:schema', b'table_meta_yaml', b'IVOA.VOTable-Parquet.content'}:
+            print(f'{key.decode("utf-8")}: {value.decode("utf-8")}')
+
+    print()
+    print('AstroPy table metadata (table_meta_yaml):')
+    print(footer[b'table_meta_yaml'].decode('utf-8'))
+
+    print()
+    print('VOParquet table metadata (IVOA.VOTable-Parquet.content):')
+    print(footer[b'IVOA.VOTable-Parquet.content'].decode('utf-8'))

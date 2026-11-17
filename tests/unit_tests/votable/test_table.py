@@ -49,6 +49,7 @@ def test_columns_and_metadata_survive_xml_round_trip():
     votable = VOTable.new(metadata, columns)
 
     assert isinstance(votable, VOTable)
+    assert not votable.resources[0].coordinate_systems
     table = round_trip(votable)
     assert [field.name for field in table.fields] == ['flux', 'target']
     assert table.fields[0].datatype == 'float'
@@ -101,6 +102,38 @@ def test_time_columns_reference_deduplicated_time_systems():
         'ref.votable.timesys0', 'ref.votable.timesys0', 'ref.votable.timesys1',
     ]
     assert {field.ref for field in table.fields} == {system.ID for system in time_systems}
+
+
+@pytest.mark.parametrize('ucd', [
+    'pos.eq.ra', 'pos.eq.dec', 'pos.eq.ra;meta.main', 'stat.error;pos.eq.dec',
+])
+@pytest.mark.parametrize('kind', ['metadata', 'column'])
+def test_coordinate_fields_automatically_reference_icrs(ucd, kind):
+    metadata = []
+    columns = []
+    if kind == 'metadata':
+        metadata.append(VOTableMetadataParam.new('position', 30.0, ucd, u.deg))
+    else:
+        columns.append(VOTableColumn.new('position', ucd, u.deg, np.array([30.0, 31.0])))
+
+    votable = VOTable.new(metadata, columns)
+    output = BytesIO()
+    votable.to_xml(output)
+    output.seek(0)
+    parsed = parse(output, verify='exception')
+    coordinate_systems = parsed.resources[0].coordinate_systems
+
+    assert len(coordinate_systems) == 1
+    coordinate_system = coordinate_systems[0]
+    assert coordinate_system.ID == 'ref.votable.coosys'
+    assert coordinate_system.system == 'ICRS'
+    assert coordinate_system.epoch is None
+    assert coordinate_system.equinox is None
+    table = parsed.get_first_table()
+    field = table.params[0] if kind == 'metadata' else table.fields[0]
+    assert field.ref == coordinate_system.ID
+    assert field.ucd == ucd
+    assert field.unit == u.deg
 
 
 def test_array_cells_preserve_shape_and_row_count():
@@ -190,9 +223,11 @@ def test_for_rges_adds_constant_metadata():
     assert [field.name for field in metadata] == [*RGES_REQUIRED_METADATA, 'exposure']
 
 
-@pytest.mark.parametrize('name', ['ccsp.name', 'ccsp.archive_lead', 'ccsp.investigator', 'ccsp.doi', 'file_date'])
+@pytest.mark.parametrize('name', [
+    'ccsp.name', 'ccsp.archive_lead', 'ccsp.investigator', 'ccsp.doi', 'file_date', 'table_meta_yaml',
+])
 @pytest.mark.parametrize('kind', ['info', 'param', 'column'])
-def test_for_rges_rejects_constant_name_collisions(name, kind):
+def test_for_rges_rejects_reserved_field_names(name, kind):
     metadata = []
     columns = []
     if kind == 'info':
@@ -202,7 +237,7 @@ def test_for_rges_rejects_constant_name_collisions(name, kind):
     else:
         columns.append(VOTableColumn.new(name, 'phot.flux', u.Jy, np.array([1.0])))
 
-    with pytest.raises(ValueError, match=f'Field name `{name}` is reserved for RGES constant metadata'):
+    with pytest.raises(ValueError, match=f'Field name `{name}` is reserved'):
         VOTable.for_rges_data_release(metadata, columns)
 
 
