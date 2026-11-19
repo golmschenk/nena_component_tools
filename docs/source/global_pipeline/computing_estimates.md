@@ -17,3 +17,7 @@ season, only after each season, etc.).
 Computing estimates will be provided on [this Confluence page](https://rgespit.atlassian.net/wiki/x/AQBwTQ). 
 The previous round of estimates is recorded [here](https://rgespit.atlassian.net/wiki/x/AYAeCg), 
 which you may want to use as your basis for your updated estimates.
+
+## How final are these estimates?
+
+Not very. We want to get the best estimates we currently can to see where we’re at, which groups/components have the biggest asks, and where we might need to figure out ways to cut back. We fully expect once we start processing real data, things will shift at least a bit. It's unlikely any such computing estimate will ever be “the final version”. Please just try to give the most accurate that you can for what you think is reasonable to request.
